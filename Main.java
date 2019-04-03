@@ -3,6 +3,10 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 /*
+
+
+Group 64
+Port Number: 20730
 @author Andy S. Llactahuamani, 500640181
 @author Akash Rai, 
 @author Danri Chen, 500765982

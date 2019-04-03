@@ -9,7 +9,8 @@ import java.awt.event.ActionListener;
 
 public class Panel extends JPanel {
     
-    private JMenuBar menuBar;
+    private static final long serialVersionUID = 1L;
+	private JMenuBar menuBar;
 
     public Panel() {
         //setLayout();
