@@ -1,7 +1,11 @@
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -18,6 +22,7 @@ public class Panel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private JPanel west;
+    private JPanel center;
     private JPanel east;
 
     private JPanel dhtPanel;
@@ -37,14 +42,45 @@ public class Panel extends JPanel {
         menuBar.add(createP2PMenu(new JMenu("P2P")));
 
         createDHTPanel();
+        createConsolePanel();
         createP2PPanel();
 
         add(west, BorderLayout.WEST);
+        add(center, BorderLayout.CENTER);
         add(east, BorderLayout.EAST);
         
     }
 
+    private void createConsolePanel() {
+
+        JLabel dhtLabel = new JLabel("DHT Output");
+        dhtLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel p2pLabel = new JLabel("P2P Output");
+        p2pLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JTextArea dhtOutput = new JTextArea();
+        dhtOutput.setLineWrap(true);
+        //dhtOutput.setEditable(false);
+        JTextArea p2pOutput = new JTextArea();
+        p2pOutput.setLineWrap(true);
+        //p2pOutput.setEditable(false);
+
+        JScrollPane dhtScroll = new JScrollPane(dhtOutput);
+        JScrollPane p2pScroll = new JScrollPane(p2pOutput);
+        
+        center = new JPanel();
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+
+        center.add(dhtLabel);
+        center.add(dhtScroll);
+        center.add(p2pLabel);
+        center.add(p2pScroll);        
+    }
+
     private void createP2PPanel() {
+
+        
+
         east = new JPanel();
         east.setLayout(new FlowLayout(4,4,4));
         east.setBackground(Color.GREEN);
@@ -65,12 +101,13 @@ public class Panel extends JPanel {
     }
 
     private void createDHTPanel() {
-
+        //Labels
         JLabel serverPortLabel = new JLabel("Server Port Number: ");
         JLabel serverIDLabel = new JLabel("Server ID: ");
         JLabel successorPortLabel = new JLabel("Successor Server Port Number: ");
         JLabel successorServerIPLabel = new JLabel("Sccuessor Server IP: ");
-
+        
+        //TextFields
         JTextField serverPortField = new JTextField();
         serverPortField.setColumns(10);
         JTextField serverIDField = new JTextField();
@@ -81,7 +118,6 @@ public class Panel extends JPanel {
         successorServerIPField.setColumns(10);
 
         JButton dhtButton = new JButton("DHT");
-
 
         //creates Jpanels w/ FlowLayout for east and west
         west = new JPanel();
