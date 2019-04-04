@@ -7,11 +7,11 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -26,11 +26,9 @@ public class Panel extends JPanel {
     private JPanel east;
 
     private JPanel dhtPanel;
-    private JPanel p2pPanel;
 
     private JMenuBar menuBar;
     
-
     public Panel() {
         //sets JPanel's layout to border layout(north, south, EAST, WEST, CENTER)
         setLayout(new BorderLayout());
@@ -79,25 +77,85 @@ public class Panel extends JPanel {
 
     private void createP2PPanel() {
 
-        
+        JLabel peerServerPortLabel = new JLabel("Peer Server Port Number: ");
+        JLabel serverOneIPLabel = new JLabel("Server One IP: ");
+        JLabel serverOneMainPortLabel = new JLabel("Server One Main Port Number: ");
+
+        JTextField peerServerPortField = new JTextField();
+        peerServerPortField.setColumns(10);
+        JTextField serverOneIPField = new JTextField();
+        serverOneIPField.setColumns(10);
+        JTextField serverOneMainPortField = new JTextField();
+        serverOneMainPortField.setColumns(10);
+
+        JButton p2pButton = new JButton("P2P");
+        JButton uploadButton = new JButton("Upload");
+        JButton downloadButton = new JButton("Download");
+        JButton exitButton = new JButton("Exit");
+
+        //TODO: MUST REPLACE THIS ARRAY WITH CONTENT NAMES FORM THE DHT
+        String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
+        JComboBox downloadSelection = new JComboBox(petStrings);
+
 
         east = new JPanel();
-        east.setLayout(new FlowLayout(4,4,4));
-        east.setBackground(Color.GREEN);
+        east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
 
-        p2pPanel = new JPanel();
-        p2pPanel.setLayout(new GridLayout(7,1,0,20));
-        p2pPanel.setBackground(Color.RED);
+        JPanel settings = new JPanel();
+        settings.setLayout(new FlowLayout());
 
-        p2pPanel.add(new JButton("6"));
-        p2pPanel.add(new JButton("7"));
-        p2pPanel.add(new JButton("8"));
-        p2pPanel.add(new JButton("9"));
-        p2pPanel.add(new JButton("10"));
-        p2pPanel.add(new JButton("11"));
-        p2pPanel.add(new JButton("12"));
+        JPanel grid = new JPanel();
+        grid.setLayout(new GridLayout(4,1,0,20));
 
-        east.add(p2pPanel);
+        JPanel clientServer = new JPanel();
+        clientServer.setLayout(new GridLayout(3,1,0,20));
+
+        JPanel line1 = new JPanel();
+        line1.setLayout(new FlowLayout(4,4,4));
+        line1.add(peerServerPortLabel);
+        line1.add(peerServerPortField);
+        grid.add(line1);
+
+
+        JPanel line2 = new JPanel();
+        line2.setLayout(new FlowLayout(4,4,4));
+        line2.add(serverOneIPLabel);
+        line2.add(serverOneIPField);
+        JPanel line3 = new JPanel();
+        grid.add(line2);
+
+
+        line3.setLayout(new FlowLayout(4,4,4));
+        line3.add(serverOneMainPortLabel);
+        line3.add(serverOneMainPortField);
+        grid.add(line3);
+
+
+        JPanel line4 = new JPanel();
+        line4.setLayout(new FlowLayout(4,4,4));
+        line4.add(p2pButton);
+        grid.add(line4);
+
+        JPanel uploadLine = new JPanel();
+        uploadLine.setLayout(new FlowLayout(4,4,4));
+        uploadLine.add(uploadButton);
+        clientServer.add(uploadLine);
+
+        JPanel downloadLine = new JPanel();
+        downloadLine.setLayout(new FlowLayout(4,4,4));
+        downloadLine.add(downloadSelection);
+        downloadLine.add(downloadButton);
+        clientServer.add(downloadLine);
+
+        JPanel exitLine = new JPanel();
+        exitLine.setLayout(new FlowLayout(4,4,4));
+        exitLine.add(exitButton);
+        clientServer.add(exitLine);
+
+        settings.add(grid);
+
+        east.add(settings);
+        east.add(clientServer);
     }
 
     private void createDHTPanel() {
