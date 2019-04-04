@@ -154,9 +154,9 @@ public class Panel extends JPanel {
 
     private void createConsolePanel() {
 
-        JLabel dhtLabel = new JLabel("DHT Output");
+        JLabel dhtLabel = new JLabel("DHT Console");
         dhtLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel p2pLabel = new JLabel("P2P Output");
+        JLabel p2pLabel = new JLabel("P2P Console");
         p2pLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         dhtOutput = new JTextArea();
