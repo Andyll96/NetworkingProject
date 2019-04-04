@@ -34,7 +34,7 @@ public class Panel extends JPanel {
     private JButton p2pButton;
     private JButton uploadButton;
     private JButton downloadButton;
-    private JButton exitButton;
+    private JButton clientServerExitButton;
 
     JTextField serverPortField;
     JTextField serverIDField;
@@ -44,6 +44,9 @@ public class Panel extends JPanel {
     JTextField peerServerPortField;
     JTextField serverOneIPField;
     JTextField serverOneMainPortField;
+
+    JTextArea dhtOutput;
+    JTextArea p2pOutput;
 
     private JMenuBar menuBar;
 
@@ -80,7 +83,30 @@ public class Panel extends JPanel {
         p2pActionListener();
 
         uploadActionListener();
+        downloadActionListener();
 
+        exitActionListener();
+
+    }
+
+    private void exitActionListener() {
+        clientServerExitButton.addActionListener(new ActionListener(){
+        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                P2PPrint("Client/Server Exit Network");
+            }
+        });
+    }
+
+    private void downloadActionListener() {
+        downloadButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                P2PPrint("DOWNLOAD BUTTON PRESSED");
+            }
+        });
     }
 
     private void uploadActionListener() {
@@ -91,7 +117,7 @@ public class Panel extends JPanel {
                 JFileChooser chooser = new JFileChooser();
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = chooser.getSelectedFile();
-                    System.out.println(selectedFile.getName() + selectedFile.getPath());
+                    P2PPrint(selectedFile.getName() + selectedFile.getPath());
                 }
             }
         });
@@ -106,7 +132,7 @@ public class Panel extends JPanel {
                 peerServerPort = peerServerPortField.getText();
                 serverOneIP = serverOneIPField.getText();
                 serverOneMainPort = serverOneMainPortField.getText();
-                System.out.println(peerServerPort + " " + serverOneIP + " " + serverOneMainPort);
+                P2PPrint(peerServerPort + " " + serverOneIP + " " + serverOneMainPort);
             }
         });
     }
@@ -121,7 +147,7 @@ public class Panel extends JPanel {
                 serverID = serverIDField.getText();
                 successorServerPort = successorPortField.getText();
                 successorServerIP = successorServerIPField.getText();
-                System.out.println(serverPort + " " + serverID + " " + successorServerPort + " " + successorServerIP);
+                DHTPrint(serverPort + " " + serverID + " " + successorServerPort + " " + successorServerIP);
             }
         });
     }
@@ -133,12 +159,12 @@ public class Panel extends JPanel {
         JLabel p2pLabel = new JLabel("P2P Output");
         p2pLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JTextArea dhtOutput = new JTextArea();
+        dhtOutput = new JTextArea();
         dhtOutput.setLineWrap(true);
-        //dhtOutput.setEditable(false);
-        JTextArea p2pOutput = new JTextArea();
+        dhtOutput.setEditable(false);
+        p2pOutput = new JTextArea();
         p2pOutput.setLineWrap(true);
-        //p2pOutput.setEditable(false);
+        p2pOutput.setEditable(false);
 
         JScrollPane dhtScroll = new JScrollPane(dhtOutput);
         JScrollPane p2pScroll = new JScrollPane(p2pOutput);
@@ -168,7 +194,7 @@ public class Panel extends JPanel {
         p2pButton = new JButton("P2P");
         uploadButton = new JButton("Upload");
         downloadButton = new JButton("Download");
-        exitButton = new JButton("Exit");
+        clientServerExitButton = new JButton("Exit");
 
         //TODO: MUST REPLACE THIS ARRAY WITH CONTENT NAMES FORM THE DHT
         String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
@@ -225,7 +251,7 @@ public class Panel extends JPanel {
 
         JPanel exitLine = new JPanel();
         exitLine.setLayout(new FlowLayout(4,4,4));
-        exitLine.add(exitButton);
+        exitLine.add(clientServerExitButton);
         clientServer.add(exitLine);
 
         settings.add(grid);
@@ -320,6 +346,14 @@ public class Panel extends JPanel {
 
         menu.add(exit);
         return menu;
+    }
+
+    public void DHTPrint(String message) {
+        dhtOutput.append(message + "\n");
+    }
+
+    public void P2PPrint(String message) {
+        p2pOutput.append(message + "\n");
     }
 
     public JMenuBar getMenuBar() {
