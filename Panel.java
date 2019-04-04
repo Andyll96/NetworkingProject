@@ -58,6 +58,8 @@ public class Panel extends JPanel {
     private String peerServerPort;
     private String serverOneIP;
     private String serverOneMainPort;
+
+    Panel self;
     
     public Panel() {
         //sets JPanel's layout to border layout(north, south, EAST, WEST, CENTER)
@@ -78,6 +80,8 @@ public class Panel extends JPanel {
         add(west, BorderLayout.WEST);
         add(center, BorderLayout.CENTER);
         add(east, BorderLayout.EAST);
+
+        self = this;
 
         dhtActionListener();
         p2pActionListener();
@@ -147,7 +151,8 @@ public class Panel extends JPanel {
                 serverID = serverIDField.getText();
                 successorServerPort = successorPortField.getText();
                 successorServerIP = successorServerIPField.getText();
-                DHTPrint(serverPort + " " + serverID + " " + successorServerPort + " " + successorServerIP);
+
+                DHTServer dhtServer = new DHTServer(serverPort, serverID, successorServerPort, successorServerIP, self);
             }
         });
     }
