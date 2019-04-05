@@ -270,7 +270,7 @@ public class Panel extends JPanel {
         JLabel serverPortLabel = new JLabel("Server Port Number: ");
         JLabel serverIDLabel = new JLabel("Server ID: ");
         JLabel successorPortLabel = new JLabel("Successor Server Port Number: ");
-        JLabel successorServerIPLabel = new JLabel("Sccuessor Server IP: ");
+        JLabel successorServerIPLabel = new JLabel("Successor Server IP: ");
         
         //TextFields
         serverPortField = new JTextField();
