@@ -1,4 +1,6 @@
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class DHTServer {
@@ -20,10 +22,12 @@ public class DHTServer {
     Thread tcpThread;
     Thread udpThread;
 
+    ServerSocket tcpSocket;
+    DatagramSocket udpSocket;
+
     Panel panel;
 
-    public DHTServer(String serverPort, String serverID, String successorServerPort, String successorServerIP,
-            Panel panel) {
+    public DHTServer(String serverPort, String serverID, String successorServerPort, String successorServerIP, Panel panel) {
         this.panel = panel;
 
         //Initializes servers variables

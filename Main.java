@@ -17,6 +17,7 @@ public class Main {
     public final static int WIDTH = 1080, HEIGHT = WIDTH / 12 * 9;
 
     public static void main(String[] args) {
+        
         //Inits and Sets up Window(JFrame)
         JFrame frame = new JFrame("Content Distribution Network");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
