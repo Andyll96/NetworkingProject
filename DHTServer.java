@@ -1,7 +1,6 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -55,7 +54,7 @@ public class DHTServer {
         try {
             this.serverIPAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (Exception e) {
-            this.panel.DHTPrint("Can't determind your IP address");
+            this.panel.DHTPrint("Can't determine your IP address: " + badRequestStatus);
         }
 
         // Initializes successor servers variables
@@ -83,12 +82,11 @@ public class DHTServer {
                 udpSocket = new DatagramSocket(this.serverPort);
             }
 
-            // TODO: init the udpSocket if the Server ID = 1
             // Defines and starts Threads for TCP and UDP connections
             initUdpThread();
             initTcpThread();
         } catch (Exception e) {
-            panel.DHTPrint("Port Number Not Available");
+            panel.DHTPrint("Port Number Not Available: " + badRequestStatus);
         }
 
     }
@@ -105,7 +103,8 @@ public class DHTServer {
                     byte[] clientDataBuffer = new byte[1024];
 
                     try {
-                        panel.DHTPrint("UDP Thread Running\n");
+                        panel.DHTPrint("UDP Thread Running");
+                        panel.DHTPrint("Waiting for message from client on port " + serverPort + "\n");
 
                         // Declares packet variable to store receieved Packet
                         DatagramPacket receivedPacket = new DatagramPacket(clientDataBuffer, clientDataBuffer.length);
@@ -158,21 +157,24 @@ public class DHTServer {
                             String[] messageComponents = message.split(" ");
                             String completeListOfIps = okStatus + " " + message;
                             panel.DHTPrint("MESSAGE TO CLIENT: " + completeListOfIps);
-                            sendToClient(messageComponents[2], Integer.parseInt(messageComponents[1]), completeListOfIps); //TODO: CHECK THAT YOU'RE GETTING THE RIGHT INFO FROM THE DATA
-                        } else if (message.contains("GET ALL IP")) { //you get a message to add your IP Address to the received message and send it to your successor.
+                            sendToClient(messageComponents[1], Integer.parseInt(messageComponents[2]), completeListOfIps);
+                        } 
+                        else if (message.contains("GET ALL IP")) { //you get a message to add your IP Address to the received message and send it to your successor.
                             String[] messageComponents = message.split(" ");
-                            int uniquePortNumber = reserveUniqueUDPPort(); 
+                            int uniquePortNumber = reserveUniqueUDPPort();
                             clientsUdpSockets.add(new UDPSocket(messageComponents[2], uniquePortNumber, server));
                             message += serverIPAddress + " " + uniquePortNumber;
-                            panel.DHTPrint("MESSAGE TO SUCCESSORl: " + message);
+                            panel.DHTPrint("MESSAGE TO SUCCESSOR: " + message);
                             sendToSuccessor(message);
-                        } else if (message.contains("EXIT") && serverID == 1) { //
+                        } 
+                        else if (message.contains("EXIT") && serverID == 1) { 
                             exitClient(message);
                             String[] messageComponents = message.split(" ");
                             message = okStatus + "";
                             panel.DHTPrint(message);
                             sendToClient(messageComponents[1], Integer.parseInt(messageComponents[2]), message);
-                        } else if (message.contains("EXIT")) { //removes the client from the server
+                        }
+                        else if (message.contains("EXIT")) { //removes the client from the server
                             exitClient(message); //kills the dedicated udp port for the client and removes records
                             panel.DHTPrint("MESSAGE TO SUCCESSOR: " + message);
                             sendToSuccessor(message);
@@ -205,12 +207,15 @@ public class DHTServer {
         for (int i = 0; i < clientsUdpSockets.size(); i++) {
             if (clientsUdpSockets.get(i).clientIP.equals(clientIP)
                     && clientsUdpSockets.get(i).clientPortNum == portNum) {
+                panel.DHTPrint("Socket " + clientsUdpSockets.get(i) + " Terminated");
                 clientsUdpSockets.get(i).kill();
+                panel.DHTPrint("Socket removed from clientsUdpSockets List");
                 clientsUdpSockets.remove(i);
                 break;
             }
         }
 
+        //removes records associated with client
         Set<String> keys = records.keySet();
         Iterator<String> itr = keys.iterator();
 
@@ -240,8 +245,7 @@ public class DHTServer {
         return testPortNum;
     }
 
-    // used when you have all the server's IP addresses and you want to send them to
-    // the client
+    // used when you have all the server's IP addresses and you want to send them to the client
     protected void sendToClient(String clientIP, int clientPort, String message) throws UnknownHostException, IOException {
         byte[] data = new byte[1024];
         data = message.getBytes();

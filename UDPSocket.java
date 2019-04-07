@@ -18,9 +18,9 @@ public class UDPSocket {
         this.server = server;
 
         try {
-            udpSocket = new DatagramSocket(clientPortNum);
+            udpSocket = new DatagramSocket(clientPortNum); //dedicated UDPSocket
         } catch (Exception e) {
-            this.server.panel.DHTPrint("UDP Port Not Available For Client");
+            this.server.panel.DHTPrint("UDP Port Not Available For Client: " + server.notFoundStatus);
         }
 
         initUdpThread();
@@ -35,7 +35,8 @@ public class UDPSocket {
                 byte[] clientDataBuffer = new byte[1024];
                 while (true) {
                     try {
-                        server.panel.DHTPrint("Clients Dedicated UDP Thread Running");
+                        server.panel.DHTPrint("Client's Dedicated UDP Thread Running");
+                        server.panel.DHTPrint("Waiting for commands from client on port " + clientPortNum);
 
                         DatagramPacket receivedPacket = new DatagramPacket(clientDataBuffer, clientDataBuffer.length);
                         udpSocket.receive(receivedPacket);
@@ -51,13 +52,14 @@ public class UDPSocket {
                                 server.sendToClient(receivedPacket.getAddress().getHostAddress(), receivedPacket.getPort(), server.notFoundStatus + server.serverIPAddress);
                             } else {
                                 server.panel.DHTPrint("MESSAGE TO CLIENT: " + server.okStatus + server.serverIPAddress);
-                                server.sendToClient(receivedPacket.getAddress().getHostAddress(), receivedPacket.getPort(), server.okStatus + " ");
+                                server.sendToClient(clientIP, receivedPacket.getPort(), server.okStatus + " " + filesIPAddress);
                             }
                         } else if (messageComponents[0] == "UPLOAD") {
                             String filename = messageComponents[1];
-                            server.records.put(filename, receivedPacket.getAddress().getHostAddress());
+                            server.records.put(filename, clientIP);
                             server.panel.DHTPrint("MESSAGE TO CLIENT: " + server.okStatus);
-                            server.sendToClient(receivedPacket.getAddress().getHostAddress(), receivedPacket.getPort(), server.okStatus + " ");
+                            server.sendToClient(clientIP, receivedPacket.getPort(), server.okStatus + " ");
+                            server.records.put(filename, clientIP);
                         } else if (messageComponents[0] == "EXIT") {
                             clientMessage = messageComponents[0] + " " + clientIP + " " + receivedPacket.getPort();
                             for (int i = 1; i <= 4; i++) {
