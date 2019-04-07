@@ -103,9 +103,6 @@ public class DHTServer {
                     byte[] clientDataBuffer = new byte[1024];
 
                     try {
-                        panel.DHTPrint("UDP Thread Running");
-                        panel.DHTPrint("Waiting for message from client on port " + serverPort + "\n");
-
                         // Declares packet variable to store receieved Packet
                         DatagramPacket receivedPacket = new DatagramPacket(clientDataBuffer, clientDataBuffer.length);
                         udpSocket.receive(receivedPacket); // receives data from the udpSocket, store in received Packet
@@ -127,8 +124,10 @@ public class DHTServer {
                 }
             }
         });
-        udpThread.start();
         panel.DHTPrint("Initializing UDP Thread...");
+        panel.DHTPrint("UDP Thread Running");
+        panel.DHTPrint("Waiting for message from client on port " + serverPort + "\n");
+        udpThread.start();
     }
 
     // Creates a TCP Socket to listen for communication from the predecessor server
@@ -141,9 +140,6 @@ public class DHTServer {
 
                     String message;
                     try {
-                        panel.DHTPrint("TCP Thread Running");
-                        panel.DHTPrint("Waiting for message from predecessor on port " + serverPort);
-
                         //listens for messages from the predecessor, creates and returns a socket that'll be used for communication 
                         Socket connectionToPredecessor = tcpSocket.accept();
                         panel.DHTPrint("Connected to " + connectionToPredecessor.getRemoteSocketAddress());
@@ -188,8 +184,10 @@ public class DHTServer {
 
             }
         });
-        tcpThread.start();
         panel.DHTPrint("Initializing TCP Thread...");
+        panel.DHTPrint("TCP Thread Running");
+        panel.DHTPrint("Waiting for message from predecessor on port " + serverPort);
+        tcpThread.start();
     }
 
     protected void exitClient(String message) {
