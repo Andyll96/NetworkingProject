@@ -42,8 +42,7 @@ public class DHTServer {
     Panel panel; // reference to the GUI Panel
     DHTServer server; // reference to this DHT server
 
-    public DHTServer(String serverPort, String serverID, String successorServerPort, String successorServerIP,
-            Panel panel) {
+    public DHTServer(String serverPort, String serverID, String successorServerPort, String successorServerIP, Panel panel) {
         this.panel = panel;
         this.server = this;
 
@@ -60,22 +59,19 @@ public class DHTServer {
         this.successorServerPort = Integer.parseInt(successorServerPort);
         this.successorServerIP = successorServerIP;
         switch (this.serverID) {
-        case 4:
-            this.successorID = 1;
-            break;
+            case 4:
+                this.successorID = 1;
+                break;
 
-        default:
-            this.successorID = this.serverID + 1;
-            break;
+            default:
+                this.successorID = this.serverID + 1;
+                break;
         }
 
         // Prints Variable Initialization
         this.panel.DHTPrint("Initializing Server Variables...");
-        this.panel.DHTPrint("Server Info:\n" + "\tServer Port Number : " + this.serverPort + "\n\tServer ID: "
-                + this.serverID + "\n\tServer IP Address: " + serverIPAddress + "\n");
-        this.panel.DHTPrint("Successor Server Info:\n" + "\tSuccessor Server Port Number: " + this.successorServerPort
-                + "\n\tSuccessor Server ID: " + this.successorID + "\n\tSuccessor Server IP Address: "
-                + this.successorServerIP + "\n");
+        this.panel.DHTPrint("Server Info:\n" + "\tServer Port Number : " + this.serverPort + "\n\tServer ID: " + this.serverID + "\n\tServer IP Address: " + serverIPAddress + "\n");
+        this.panel.DHTPrint("Successor Server Info:\n" + "\tSuccessor Server Port Number: " + this.successorServerPort + "\n\tSuccessor Server ID: " + this.successorID + "\n\tSuccessor Server IP Address: " + this.successorServerIP + "\n");
 
         try {
             // essentially the welcome socket
@@ -110,18 +106,15 @@ public class DHTServer {
 
                         // Declares packet variable to store receieved Packet
                         DatagramPacket receivedPacket = new DatagramPacket(clientDataBuffer, clientDataBuffer.length);
-                        udpSocket.receive(receivedPacket); // receives and stores data in receivedPacket Variable
+                        udpSocket.receive(receivedPacket); // receives data from the udpSocket, store in received Packet
 
                         clientMessage = new String(receivedPacket.getData()); // extracts message from UDP packet
                         panel.DHTPrint("MESSAGE FROM CLIENT: " + clientMessage);
 
-                        if (clientMessage.contains("GET ALL IP")) {
-                            int uniquePortNumber = reserveUniqueUDPPort();
-                            clientsUdpSockets.add(new UDPSocket(receivedPacket.getAddress().getHostAddress(),
-                                    uniquePortNumber, server)); // creates unique UDP Port for initializing client
-                            clientMessage = "GET ALL IP" + receivedPacket.getPort()
-                                    + receivedPacket.getAddress().getHostAddress() + " " + serverIPAddress + " "
-                                    + uniquePortNumber;
+                        if (clientMessage.contains("GET ALL IP")) { //when a client wants to join, they initialize by sending GET ALL IP message
+                            int uniquePortNumber = reserveUniqueUDPPort(); //search for an available port number 
+                            clientsUdpSockets.add(new UDPSocket(receivedPacket.getAddress().getHostAddress(), uniquePortNumber, server)); // creates unique UDP Port for initializing client w/ the reserved port number. This UDP Socket will listen for client Commands (QUERY, UPLOAD, KILL)
+                            clientMessage = "GET ALL IP" + receivedPacket.getPort() + receivedPacket.getAddress().getHostAddress() + " " + serverIPAddress + " " + uniquePortNumber; //the successor servers will append their IP Addresses and the unique UDP Port Number they will create
                             panel.DHTPrint("MESSAGE SENT TO SUCCESSOR SERVER: " + clientMessage);
                             sendToSuccessor(clientMessage); //message's appended with server details
                         }
@@ -136,6 +129,7 @@ public class DHTServer {
         panel.DHTPrint("Initializing UDP Thread...");
     }
 
+    // Creates a TCP Socket to listen for communication from the predecessor server
     private void initTcpThread() {
         tcpThread = new Thread(new Runnable() {
 
@@ -157,16 +151,21 @@ public class DHTServer {
                         message = data.readUTF();
                         panel.DHTPrint("RECEIVED MESSAGE FROM PREDECESSOR: " + message);
 
-                        if (message.contains("GET ALL IP") && serverID == 1) { //where server sends IP Addresses of all servers to the p2p client
-                            String listOfIPMessage = okStatus + message;
-                            panel.DHTPrint("MESSAGE TO CLIENT: " + listOfIPMessage);
-                            //sendToClient();
-
+                        if (message.contains("GET ALL IP") && serverID == 1) { //message has made it's rounds through the server pool, send info w/ all IP Addresses to client
+                            String[] messageComponents = message.split(" ");
+                            String completeListOfIps = okStatus + " " + message;
+                            panel.DHTPrint("MESSAGE TO CLIENT: " + completeListOfIps);
+                            sendToClient(messageComponents[2], Integer.parseInt(messageComponents[1]), completeListOfIps); //TODO: CHECK THAT YOU'RE GETTING THE RIGHT INFO FROM THE DATA
                         } else if (message.contains("GET ALL IP")) { //you get a message to add your IP Address to the received message and send it to your successor.
+                            String[] messageComponents = message.split(" ");
+                            int uniquePortNumber = reserveUniqueUDPPort(); 
+                            clientsUdpSockets.add(new UDPSocket(messageComponents[2], uniquePortNumber, server));
+                            message += serverIPAddress + " " + uniquePortNumber;
+                            panel.DHTPrint("MESSAGE TO SUCCESSORl: " + message);
+                            sendToSuccessor(message);
+                        } else if (message.contains("EXIT") && serverID == 1) { //
 
-                        } else if () {//TODO:
-
-                        } else if () {//TODO:
+                        } else if (message.contains("EXIT")) { //
 
                         }
 
@@ -202,8 +201,7 @@ public class DHTServer {
 
     // used when you have all the server's IP addresses and you want to send them to
     // the client
-    protected void sendToClient(String clientIP, int clientPort, String message)
-            throws UnknownHostException, IOException {
+    protected void sendToClient(String clientIP, int clientPort, String message) throws UnknownHostException, IOException {
         byte[] data = new byte[1024];
         data = message.getBytes();
         InetAddress ipAddress = InetAddress.getByName(clientIP);
