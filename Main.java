@@ -14,7 +14,7 @@ Port Number: 20730
 
 public class Main {
 
-    public final static int WIDTH = 1080, HEIGHT = WIDTH / 12 * 9;
+    public final static int WIDTH = 900, HEIGHT = WIDTH / 12 * 9;
 
     public static void main(String[] args) {
         //Inits and Sets up Window(JFrame)
