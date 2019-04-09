@@ -137,6 +137,8 @@ public class Panel extends JPanel {
                 serverOneIP = serverOneIPField.getText();
                 serverOneMainPort = serverOneMainPortField.getText();
                 P2PPrint(peerServerPort + " " + serverOneIP + " " + serverOneMainPort);
+
+                ClientServer p2pClient = new ClientServer(serverOneIP, serverOneMainPort, peerServerPort);
             }
         });
     }
