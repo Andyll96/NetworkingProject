@@ -34,6 +34,7 @@ public class Main {
         frame.setJMenuBar(panel.getMenuBar());
 
         frame.setVisible(true);
+
     }
 
 }
