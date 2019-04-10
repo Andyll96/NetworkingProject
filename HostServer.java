@@ -2,6 +2,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 import java.text.*;
+import java.nio.charset.*;
 
 
 public class HostServer{
@@ -117,6 +118,14 @@ public class HostServer{
                 DataInputStream inStream;
                 Scanner scan;
                 File file, badFile, file2;
+                byte[] finalBytes;
+                double fileSize;
+                String lastModified;
+                byte[] fileBytes, httpBytes;
+                FileInputStream fileInstream;
+                OutputStream outStream;
+                DataOutputStream dataOutstream;
+
                 try
                 {
                     tcpSocket = TCP.accept();
@@ -151,16 +160,106 @@ public class HostServer{
                                 {
                                     file = new File(temp2 + ".jpg");
                                 }
+
+                                //HTTP Status Code 200
+
+                                if (file.exists())
+                                {
+                                    fileSize = file.length();
+                                    lastModified = getFileModifiedTime(file);
+
+                                    response = createResponse(httpStatusCode200, timeString, lastModified, "bytes", Integer.toString((int) fileSize), connection, cType);
+                                    httpBytes = response.getBytes(Charset.forName("UTF-8"));
+                                    fileBytes = new byte[(int) file.length()];
+
+                                    fileInstream = new FileInputStream(file);
+                                    fileInstream.read(fileBytes);
+                                    fileInstream.close();
+
+                                    finalBytes = new byte[httpBytes.length + fileBytes.length];
+                                    System.arraycopy(httpBytes, 0, finalBytes, 0, httpBytes.length);
+                                    System.arraycopy(fileBytes, 0, finalBytes, httpBytes.length, fileBytes.length);
+                                }
+
+                                //HTTP Status Code 404
+                                else
+                                {
+                                    response = createResponse(httpStatusCode404, timeString, null, null, null, connection, null);
+                                    finalBytes = response.getBytes(Charset.forName("UTF-8"));
+                                }
+
+                                //HTTP Status Code 400
+                            }catch (Exception e)
+                            {
+                                response = createResponse(httpStatusCode400, timeString, null, null, null, connection, null);
+                                finalBytes = response.getBytes(Charset.forName("UTF-8"));
                             }
                         }
+
+                        //HTTP Status Codec 505
+                        else
+                        {
+                            response = createResponse(httpStatusCode505, timeString, null, null, null, connection, null);
+                            finalBytes = response.getBytes(Charset.forName("UTF-8"));
+                        }
                     }
+
+                    outStream = tcpSocket.getOutputStream();
+                    dataOutstream = new DataOutputStream(outStream);
+                    dataOutstream.writeInt(finalBytes.length);
+                    dataOutstream.write(finalBytes, 0, finalBytes.length);
+                    tcpSocket.close();
+                    TCP.close();
+
+                    for (int i = 0; i < PeerServer.peerClientList.size(); i++)
+                    {
+                        if (PeerServer.peerClientList.get(i).equals(this))
+                        {
+                            PeerServer.peerClientList.remove(i);
+                            TCPThread.stop();
+                            break;
+                        }
+                    }
+
                 } catch (Exception e)
                 {
                     System.out.println(e);
-
                 }
 
             }
+        };
+
+        public String getTime()
+        {
+            Date date = new Date();
+            Date time = new Date();
+            Scanner scan = new Scanner(date.toString());
+            String dayName, month, dateNumber, timeString;
+            DateFormat timeFormat = new SimpleDateFormat("yyyy HH:mm:ss");
+
+            dayName = scan.next();
+            month = scan.next();
+            dateNumber = scan.next();
+            timeString = dayName + ", " + dateNumber + " " + month + " " + timeFormat.format(time) + " GMT";
+            return timeString;
+        }
+
+        public String getFileModifiedTime(File file)
+        {
+            Date date, time;
+            Scanner scan;
+            String dayName, month, dateNumber, timeString;
+            DateFormat timeFormat = new SimpleDateFormat("yyyy HH:mm:ss");
+
+            date = new Date(file.lastModified());
+            scan = new Scanner(date.toString());
+            time = new Date(file.lastModified());
+            dayName = scan.next();
+            month = scan.next();
+            dateNumber = scan.next();
+
+            timeString = dayName + ", " + dateNumber + " " + month + " " + timeFormat.format(time) + " GMT";
+            return timeString;
         }
     }
 
