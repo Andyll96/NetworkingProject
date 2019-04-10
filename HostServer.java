@@ -112,13 +112,14 @@ public class HostServer{
                 DataInputStream inStream;
                 Scanner scan;
                 File file, badFile, file2;
-                byte[] finalBytes;
+                byte[] finalBytes = null;
                 double fileSize;
                 String lastModified;
                 byte[] fileBytes, httpBytes;
                 FileInputStream fileInstream;
                 OutputStream outStream;
                 DataOutputStream dataOutstream;
+                timeString = getTime();
 
                 try
                 {
@@ -258,7 +259,7 @@ public class HostServer{
 
         public String createResponse(int statusCode, String currentDate, String modifiedDate, String acceptRange, String length, String connection, String cType)
         {
-            String temp;
+            String temp = "";
 
             switch (statusCode)
             {
