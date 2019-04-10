@@ -8,19 +8,20 @@ import java.nio.charset.*;
 public class HostServer{
      final int httpStatusCode200 = 200; //Ok
 
-     ServerSocket hostServerTCP;
-     Thread hostThread;
-     String TCPMessage;
-     public static ArrayList<UniqueTCP> peerClientList = new ArrayList<UniqueTCP>();
+    ServerSocket hostServerTCP;
+    Thread hostThread;
+    String TCPMessage;
+    int originPort;
+    public static ArrayList<UniqueTCP> peerClientList = new ArrayList<UniqueTCP>();
 
     //method to initialize server
-    public HostServer(int portNum, Panel panel)
+    public HostServer(int portNum)
     {
-        //originPort = portNum;
+        originPort = portNum;
         
         try {
             hostServerTCP = new ServerSocket(portNum);
-            hostThread = new Thread();
+            hostThread = new Thread(TCPThread);
             hostThread.start();
         } catch (Exception e) {
             //TODO: handle exception
@@ -60,16 +61,19 @@ public class HostServer{
                 DataOutputStream outStream;
                 Scanner scan;
                 int availablePort;
+                String message;
                 try {
                     clientSocket = hostServerTCP.accept();
                     inStream = new DataInputStream(clientSocket.getInputStream());
-                    scan = new Scanner(inStream.readUTF());
+                    message = inStream.readUTF();
+                    scan = new Scanner(message);
                     scan.next(); 
 
-                    availablePort = nextAvailablePort();   
-                    System.out.println(httpStatusCode200 + " " + availablePort);
+                    availablePort = nextAvailablePort();
+                    peerClientList.add(new UniqueTCP(originPort));
+                    message = httpStatusCode200 + " " + availablePort;
                     outStream = new DataOutputStream(clientSocket.getOutputStream());
-                    outStream.writeUTF(inStream.readUTF());
+                    outStream.writeUTF(message);
                     clientSocket.close();
 
                 } catch (Exception e) {
@@ -91,12 +95,13 @@ public class HostServer{
         ServerSocket TCP;
         Thread TCPThread;
 
-        public UniqueTCP(int portNum, Panel panel)
+        public UniqueTCP(int portNum)
         {
             try
             {
                 TCP = new ServerSocket(portNum);
-                TCPThread = new Thread();
+                TCPThread = new Thread(TCPConnectRun);
+                TCPThread.start();
             } catch (Exception e){
                 //TODO: handle exception
                 System.out.println("Not a valid port number");

@@ -24,7 +24,7 @@ public class Main {
         frame.setSize(new Dimension(WIDTH, HEIGHT));
         frame.requestFocus();
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
+        frame.setResizable(true);
         System.out.println("Panel init");
 
         //Inits and Sets up Panel to place in Window

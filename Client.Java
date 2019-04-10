@@ -21,7 +21,7 @@ public static class Client {
     DatagramSocket clientUDPSocket;
 
     public Client(String severOneIP, int serverOnePort, int peerServerPort, Panel panel) {
-      
+    
         this.peerSeverPort  = peerServerPort;
         this.serverIPs[0] = serverOneIP;
         this.severPortNumbers[0] = serverOnePort;

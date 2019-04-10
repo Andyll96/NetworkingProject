@@ -45,8 +45,9 @@ public class Panel extends JPanel {
     JTextField serverOneIPField;
     JTextField serverOneMainPortField;
 
+    JTextField downloadSelection;
+
     JTextArea dhtOutput;
-    JTextArea p2pOutput;
 
     private JMenuBar menuBar;
 
@@ -59,7 +60,15 @@ public class Panel extends JPanel {
     private String serverOneIP;
     private String serverOneMainPort;
 
+    private String downloadSelectionText;
+
     Panel self;
+
+    DHTServer dhtServer;
+
+    boolean uploadButtonBool;
+    boolean downloadButtonBool;
+    boolean exitButtonBool;
     
     public Panel() {
         //sets JPanel's layout to border layout(north, south, EAST, WEST, CENTER)
@@ -79,69 +88,19 @@ public class Panel extends JPanel {
         //Sets Panels to the LEFT, CENTER, and RIGHT side of the Window
         add(west, BorderLayout.WEST);
         add(center, BorderLayout.CENTER);
-        add(east, BorderLayout.EAST);
+        //add(east, BorderLayout.EAST);
 
         self = this;
+        uploadButtonBool = false;
+        downloadButtonBool = false;
+        exitButtonBool = false;
 
         dhtActionListener();
-        p2pActionListener();
 
-        uploadActionListener();
-        downloadActionListener();
-
-        exitActionListener();
 
     }
 
-    private void exitActionListener() {
-        clientServerExitButton.addActionListener(new ActionListener(){
-        
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                P2PPrint("Client/Server Exit Network");
-            }
-        });
-    }
 
-    private void downloadActionListener() {
-        downloadButton.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                P2PPrint("DOWNLOAD BUTTON PRESSED");
-            }
-        });
-    }
-
-    private void uploadActionListener() {
-        uploadButton.addActionListener(new ActionListener(){
-        
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = chooser.getSelectedFile();
-                    P2PPrint(selectedFile.getName() + selectedFile.getPath());
-                }
-            }
-        });
-    }
-
-    private void p2pActionListener() {
-        p2pButton.addActionListener(new ActionListener(){
-        
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //System.out.println("P2P Press");
-                peerServerPort = peerServerPortField.getText();
-                serverOneIP = serverOneIPField.getText();
-                serverOneMainPort = serverOneMainPortField.getText();
-                P2PPrint(peerServerPort + " " + serverOneIP + " " + serverOneMainPort);
-
-                ClientServer p2pClient = new ClientServer(serverOneIP, serverOneMainPort, peerServerPort);
-            }
-        });
-    }
 
     private void dhtActionListener(){
         dhtButton.addActionListener(new ActionListener() {
@@ -154,7 +113,7 @@ public class Panel extends JPanel {
                 successorServerPort = successorPortField.getText();
                 successorServerIP = successorServerIPField.getText();
 
-                DHTServer dhtServer = new DHTServer(serverPort, serverID, successorServerPort, successorServerIP, self);
+                dhtServer = new DHTServer(serverPort, serverID, successorServerPort, successorServerIP, self);
             }
         });
     }
@@ -163,26 +122,20 @@ public class Panel extends JPanel {
 
         JLabel dhtLabel = new JLabel("DHT Console");
         dhtLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel p2pLabel = new JLabel("P2P Console");
-        p2pLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
 
         dhtOutput = new JTextArea();
         dhtOutput.setLineWrap(true);
         dhtOutput.setEditable(false);
-        p2pOutput = new JTextArea();
-        p2pOutput.setLineWrap(true);
-        p2pOutput.setEditable(false);
+
 
         JScrollPane dhtScroll = new JScrollPane(dhtOutput);
-        JScrollPane p2pScroll = new JScrollPane(p2pOutput);
         
         center = new JPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
 
         center.add(dhtLabel);
         center.add(dhtScroll);
-        center.add(p2pLabel);
-        center.add(p2pScroll);        
     }
 
     private void createP2PPanel() {
@@ -203,9 +156,8 @@ public class Panel extends JPanel {
         downloadButton = new JButton("Download");
         clientServerExitButton = new JButton("Exit");
 
-        //TODO: MUST REPLACE THIS ARRAY WITH CONTENT NAMES FORM THE DHT
-        String[] petStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
-        JComboBox downloadSelection = new JComboBox(petStrings);
+        downloadSelection = new JTextField();
+        downloadSelection.setColumns(10);
 
         east = new JPanel();
         east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
@@ -357,10 +309,6 @@ public class Panel extends JPanel {
 
     public void DHTPrint(String message) {
         dhtOutput.append(message + "\n");
-    }
-
-    public void P2PPrint(String message) {
-        p2pOutput.append(message + "\n");
     }
 
     public JMenuBar getMenuBar() {
