@@ -6,13 +6,7 @@ import java.nio.charset.*;
 
 
 public class HostServer{
-     int originPort = Panel.ServerPort;
-
-     final int httpStatusCode200 = 200; //Ok 
-     final int httpStatusCode301 = 301; //Moved Permanently
-     final int httpStatusCode400 = 400; //Bad request
-     final int httpStatusCode404 = 404; //Cannot be found
-     final int httpStatusCode505 = 505; //not supported
+     final int httpStatusCode200 = 200; //Ok
 
      ServerSocket hostServerTCP;
      Thread hostThread;
@@ -38,7 +32,7 @@ public class HostServer{
     {
         int currentPort = 0;
         
-        boolean foundPort = False;
+        boolean foundPort = false;
         
         while (foundPort == false)
         {
@@ -102,7 +96,7 @@ public class HostServer{
             try
             {
                 TCP = new ServerSocket(portNum);
-                TCPThread = new Thread()
+                TCPThread = new Thread();
             } catch (Exception e){
                 //TODO: handle exception
                 System.out.println("Not a valid port number");
@@ -211,11 +205,11 @@ public class HostServer{
                     tcpSocket.close();
                     TCP.close();
 
-                    for (int i = 0; i < PeerServer.peerClientList.size(); i++)
+                    for (int i = 0; i < HostServer.peerClientList.size(); i++)
                     {
-                        if (PeerServer.peerClientList.get(i).equals(this))
+                        if (HostServer.peerClientList.get(i).equals(this))
                         {
-                            PeerServer.peerClientList.remove(i);
+                            HostServer.peerClientList.remove(i);
                             TCPThread.stop();
                             break;
                         }
@@ -260,6 +254,43 @@ public class HostServer{
 
             timeString = dayName + ", " + dateNumber + " " + month + " " + timeFormat.format(time) + " GMT";
             return timeString;
+        }
+
+        public String createResponse(int statusCode, String currentDate, String modifiedDate, String acceptRange, String length, String connection, String cType)
+        {
+            String temp;
+
+            switch (statusCode)
+            {
+                case 200:
+                    temp += "HTTP/1.1 200 OK \r\n";
+                    temp += "Connection: " + connection + "\r\n";
+                    temp += "Date: " + currentDate + "\r\n";
+                    temp += "Last Modified: " + modifiedDate + "\r\n";
+                    temp += "Accept Ranges: " + acceptRange + "\r\n";
+                    temp += "Content Length: " + length + "\r\n";
+                    temp += "Content Type: " + cType + "\r\n";
+                    break;
+                case 400:
+                    temp += "HTTP/1.1 400 Bad Request \r\n";
+                    temp += connectionDate(connection, currentDate);
+                    break;
+                case 404:
+                    temp += "HTTP/1.1 404 Not Found \r\n";
+                    temp += connectionDate(connection, currentDate);
+                    break;
+                case 505:
+                    temp += "HTTP/1.1 505 HTTP Version Not Supported \r\n";
+                    temp += connectionDate(connection, currentDate);
+                    break;
+            }
+
+            return temp;
+        }
+
+        public String connectionDate(String connection, String currentDate)
+        {
+            return "Connection: " + connection + "\r\n" + "Date: " + currentDate + "\r\n\r\n";
         }
     }
 
