@@ -80,10 +80,11 @@ public class DHTServer {
             tcpSocket = new ServerSocket(this.serverPort);
             if (this.serverID == 1) {
                 udpSocket = new DatagramSocket(this.serverPort);
+				initUdpThread();
             }
 
             // Defines and starts Threads for TCP and UDP connections
-            initUdpThread();
+            
             initTcpThread();
         } catch (Exception e) {
             panel.DHTPrint("Port Number Not Available: " + badRequestStatus);
